@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <script src="http://cdn.bootcss.com/vue/2.2.6/vue.min.js"></script>
+  <style>
+    *:focus,*:active{
+      outline: none;
+    }
+    .todoColor{
+      color: #337ab7;
+    }
+    .isFinished{
+      text-decoration: line-through !important;
+      color:#999 !important;
+    }
+  </style>
+</head>
+<body>
+<div class="contaner">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <div class="todo">
+        <!--导航-->
+        <div class="navbar navbar-default">
+          <div class="container-fluid">
+            <h1 class="text-center text-primary">TODO 列表</h1>
+          </div>
+        </div>
+        <!--输入框-->
+        <div class="inputfield">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <div class="panel-title">
+                添加任务
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="input-group input-group-lg">
+                <input
+                  v-model="newTaskList"
+                  @keyup.enter="addTaskListHandle"
+                  class="form-control todoColor"
+                  placeholder="请输入任务                 提示：+回车即可添加任务"
+                  type="text" autofocus>
+                <span class="input-group-btn">
+              <button @click="addTaskListHandle"  class="btn btn-primary btn-block">提交</button>
+            </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!--显示框-->
+        <div class="outputfield">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <div class="panel-title">任务列表</div>
+            </div>
+            <div class="panel-body">
+              <ul class="nav nav-pills nav-danger">
+                <li :class="{active:visibility==='all'}"><a href="#all">所有任务</a></li>
+                <li :class="{active:visibility==='unfinished'}">
+                  <a href="#unfinished">
+                    未完成的任务
+                    <span class="badge" type="button">{{noChooseHandle}}</span>
+                  </a>
+                </li>
+                <li :class="{active:visibility==='finished'}"><a href="#finished">完成的任务</a></li>
+              </ul>
+              <ul class="list-group">
+                <li
+                  v-for="i in filteredHandle"
+                  @mouseover="showDeleHandle(i)"
+                  @mouseout="hideDeleHandle(i)"
+                  class="list-group-item">
+
+                  <div class="input-group input-group-lg">
+                    <div class="input-group-addon">
+                      <input v-model="i.isFinished" type="checkbox">
+                    </div>
+                    <input class="form-control todoColor"
+                           :value="i.title"
+                           :class="{isFinished:i.isFinished}"
+                           type="text">
+                    <div v-show="i.isDele" class="input-group-addon">
+                      <button @click="removeTaskListHandle(i)" type="button" class="close"><span>&times;</span></button>
+                    </div>
+
+                  </div>
+
+                </li>
+              </ul>
+              <strong v-show="taskList.length==0"  class="text-danger">╮(╯▽╰)╭ 没有任务...</strong>
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  var storage={
+    save(key,value){
+      localStorage.setItem(key,JSON.stringify(value));
+    },
+    fetch(key){
+      return JSON.parse(localStorage.getItem(key)) || [];
+    }
+  };
+  var taskList=storage.fetch('churjan');
+  var filter={
+    all:function(taskList){
+      return taskList;
+    },
+    finished:function(taskList){
+      return taskList.filter(function (item) {
+        return item.isFinished;
+      })
+    },
+    unfinished:function(taskList){
+      return taskList.filter(function (item) {
+        return !item.isFinished;
+      })
+    }
+  };
+  var vm=new Vue({
+    el:'.todo',
+    data:{
+      taskList:taskList,
+      newTaskList:'',
+      visibility:'all'
+    },
+    computed:{
+      noChooseHandle(){
+        return this.taskList.filter(function(item){
+          return !item.isFinished;
+        }).length
+      },
+      filteredHandle(){
+        return filter[this.visibility]?filter[this.visibility](this.taskList):taskList;
+      }
+    },
+    watch:{
+      taskList:{
+        handler:function(){
+          storage.save('churjan',this.taskList);
+        },
+        deep:true
+      }
+    },
+    methods:{
+      addTaskListHandle(){
+        var value=this.newTaskList && this.newTaskList.trim();
+        if(!value) return;
+
+        this.taskList.unshift({
+          title:value,
+          isFinished:false,
+          isDele:false
+        });
+        this.newTaskList='';
+      },
+      removeTaskListHandle(currentTaskList){
+        var index=this.taskList.indexOf(currentTaskList);
+        this.taskList.splice(index,1);
+      },
+      showDeleHandle(currentTaskList){
+        var index=this.taskList.indexOf(currentTaskList);
+        this.taskList[index].isDele=true;
+      },
+      hideDeleHandle(currentTaskList){
+        var index=this.taskList.indexOf(currentTaskList);
+        this.taskList[index].isDele=false;
+      }
+
+    }
+  });
+  function hashChangeHandle(){
+    var hash=window.location.hash.slice(1);
+    vm.visibility=hash;
+  }
+  hashChangeHandle();
+  window.addEventListener('hashchange',hashChangeHandle);
+</script>
+</body>
+</html>

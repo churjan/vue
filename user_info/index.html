@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>user_info</title>
+  <link href="http://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="http://cdn.bootcss.com/jquery/3.2.0/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://cdn.bootcss.com/vue/2.2.6/vue.min.js"></script>
+</head>
+<body>
+<br><br>
+<div class="container" id="user_info">
+  <form>
+    <div class="form-group form-group-lg">
+      <label for="uname">用户名</label>
+      <input class="form-control" v-model="uname" id="uname" type="text" placeholder="请输入用户名" autofocus>
+    </div>
+    <div class="form-group form-group-lg">
+      <label for="uage">年龄</label>
+      <input class="form-control" @keyup.enter="addHandle" v-model="uage" id="uage" type="text" placeholder="请输入年龄">
+    </div>
+    <div class="form-group form-group-lg">
+      <input class="btn btn-primary btn-lg" type="button" value="添加" @click="addHandle">
+      <input class="btn btn-danger btn-lg" type="reset" value="重置">
+    </div>
+  </form>
+
+  <table class="table table-hover table-bordered text-center">
+    <caption>用户信息表</caption>
+    <tr>
+      <th>序号</th>
+      <th>用户名</th>
+      <th>年龄</th>
+      <th>操作</th>
+    </tr>
+    <tr v-for="(item,index) in userData">
+      <td>{{index+1}}</td>
+      <td>{{item.name}}</td>
+      <td>{{item.age}}</td>
+      <td>
+        <button
+          @click="curIndex=index"
+          type="button" class="btn btn-danger btn-sm"
+          data-toggle="modal" data-target="#custom-modal">删除</button>
+      </td>
+    </tr>
+    <tr v-show="!userData.length">
+      <td colspan="4">
+        <p class="text-info">暂无内容...</p>
+      </td>
+    </tr>
+  </table>
+
+
+  <!--modal-->
+  <div class="modal" id="custom-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="close" data-dismiss="modal"><span>&times;</span></div>
+          <div class="modal-title">警告</div>
+        </div>
+        <div class="modal-body">
+          <p>确定要删除吗？</p>
+        </div>
+        <div class="modal-footer">
+          <button
+            @click="delHandle(curIndex)"
+            class="btn btn-primary"
+            data-toggle="modal" data-target="#custom-modal">确定</button>
+          <button class="btn btn-danger" data-dismiss="modal">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="index.js"></script>
+
+</body>
+</html>
