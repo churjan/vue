@@ -16,17 +16,14 @@
   </div>
   <!--输入框-->
   <div class="container">
-    <div class="input-group input-group-lg">
-      <input
+      <textarea
         v-model="newMsg"
         @keyup.enter="addMsgHandle"
         class="form-control"
         placeholder="请输入留言 按 enter 键即可提交"
-        type="text" autofocus>
-      <span class="input-group-btn">
-        <button @click="addMsgHandle" class="btn btn-primary btn-block">提交</button>
-      </span>
-    </div>
+        rows="10" autofocus>
+      </textarea>
+        <button @click="addMsgHandle" class="btn btn-primary btn-lg pull-right">提交</button>
   </div>
   <br><br>
   <!--显示框-->
